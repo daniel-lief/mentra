@@ -26,7 +26,7 @@ Requirements:
 - Each module should focus on one key subtopic or skill needed to master the overall topic.
 - Titles should be concise, engaging, and clear (5–10 words each).
 - Order them in a logical learning sequence (beginner → advanced).
-- Include a one-sentence description for each module explaining what it covers.
+- Include a 10 to 12 word description for each module explaining what it covers. 
 
 The output must follow the following JSON format. The output MUST be valid JSON (use escape characters like '\\n' for newlines between paragraphs, etc). You should not include any extraneous text or symbols. Example output format:
 [
