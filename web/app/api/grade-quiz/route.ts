@@ -62,7 +62,6 @@ The output must follow the following JSON format. You should not include any ext
 
     const responseText = completion.choices[0]?.message?.content || '';
     
-    // Parse the JSON response
     const gradingResults = JSON.parse(responseText);
 
     return NextResponse.json(gradingResults);
