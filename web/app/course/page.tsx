@@ -98,7 +98,7 @@ export default function CoursePage() {
               {courseTopic}
             </h1>
             <p className="mt-3 max-w-2xl text-base leading-relaxed text-slate-600">
-              Master {courseTopic.toLowerCase()} through interactive lessons and hands-on quizzes designed for comprehensive learning.
+              Master {courseTopic.toLowerCase()} through interactive lessons and hands-on quizzes!
             </p>
 
             <div className="mt-6 flex flex-wrap items-center gap-4">
@@ -141,11 +141,13 @@ export default function CoursePage() {
                 return (
                   <li key={module.module_number} className="relative pl-10">
                     {/* Timeline dot */}
-                    <div className={`absolute left-[0.4rem] top-[1.4rem] h-4 w-4 rounded-full border-2 ${
-                      isCompleted 
-                        ? 'border-indigo-600 bg-indigo-600' 
-                        : 'border-slate-300 bg-white'
-                    }`}>
+                    <div
+                      className={`absolute left-2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-4 w-4 rounded-full border-2 flex items-center justify-center ${
+                        isCompleted
+                          ? 'border-indigo-600 bg-indigo-600'
+                          : 'border-slate-300 bg-white'
+                      }`}
+                    >
                       {isCompleted && (
                         <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
