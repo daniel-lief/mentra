@@ -29,7 +29,7 @@ Task:
 3. Use examples, analogies, and short paragraphs for readability.
 4. End with a short quiz (3–5 questions) that tests key points from the lecture.
 
-The output must follow the following JSON format. The output MUST be valid JSON (use escape characters like '\\n' for newlines between paragraphs, etc). You should not include any extraneous text or symbols. Example output format:
+The output must follow the following JSON format. The output MUST be valid JSON (use escape characters like '\\n' for newlines between paragraphs, etc). You should not include any extraneous text or symbols. For the quiz options, you must start each option with a letter (e.g. "A.", "B.", etc). Example output format:
 {
 \t"lecture_title": "string",
 \t"lecture_text": "multi-paragraph explanation",
@@ -37,7 +37,7 @@ The output must follow the following JSON format. The output MUST be valid JSON 
 \t\t{
 \t\t\t"question_number": 1,
 \t\t\t"question_text": "string",
-\t\t\t"options": ["A.", "B.", "C.", "D."],
+\t\t\t"options": ["A. First option", "B. Second option", "C. Third option", "D. Fourth option"],
 \t\t\t"correct_answer": "A",
 \t\t\t"explanation": "Why this answer is correct."
 \t\t},
