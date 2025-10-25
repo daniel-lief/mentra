@@ -35,7 +35,11 @@ export default function CoursePage() {
   }, [router]);
 
   const handleStartModule = (moduleNumber: number) => {
-    router.push(`/lecture/${moduleNumber}`);
+    const module = modules.find((m) => m.module_number === moduleNumber);
+    if (module) {
+      sessionStorage.setItem("currentModule", JSON.stringify(module));
+    }
+    router.push('/lecture/${moduleNumber}');
   };
 
   const progressPercent = modules.length > 0 
