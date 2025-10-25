@@ -33,7 +33,7 @@ Instructions:
 - Give a short explanation for each, referencing the relevant concept from the lecture.
 - If any are wrong, recommend which section of the lecture to review.
 
-The output must follow the following JSON format. You should not include any extraneous text or symbols. Example output format:
+The output must follow the following JSON format. The output MUST be valid JSON (use escape characters like '\\n' for newlines between paragraphs, etc). You should not include any extraneous text or symbols. Example output format:
 {
 \t"graded_results": [
 \t\t{

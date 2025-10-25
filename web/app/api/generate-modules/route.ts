@@ -27,7 +27,7 @@ Requirements:
 - Order them in a logical learning sequence (beginner → advanced).
 - Include a one-sentence description for each module explaining what it covers.
 
-The output must follow the following JSON format. You should not include any extraneous text or symbols. Example output format:
+The output must follow the following JSON format. The output MUST be valid JSON (use escape characters like '\\n' for newlines between paragraphs, etc). You should not include any extraneous text or symbols. Example output format:
 [
 \t{
 \t\t"module_number": 1,

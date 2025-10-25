@@ -28,7 +28,7 @@ Task:
 3. Use examples, analogies, and short paragraphs for readability.
 4. End with a short quiz (3–5 questions) that tests key points from the lecture.
 
-The output must follow the following JSON format. You should not include any extraneous text or symbols. Example output format:
+The output must follow the following JSON format. The output MUST be valid JSON (use escape characters like '\\n' for newlines between paragraphs, etc). You should not include any extraneous text or symbols. Example output format:
 {
 \t"lecture_title": "string",
 \t"lecture_text": "multi-paragraph explanation",
@@ -57,6 +57,7 @@ The output must follow the following JSON format. You should not include any ext
     });
 
     const responseText = completion.choices[0]?.message?.content || '';
+      console.error("content:\n", responseText);
     
     const content = JSON.parse(responseText);
 
