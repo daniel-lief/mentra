@@ -57,7 +57,6 @@ The output must follow the following JSON format. The output MUST be valid JSON 
     });
 
     const responseText = completion.choices[0]?.message?.content || '';
-      console.error("content:\n", responseText);
     
     const content = JSON.parse(responseText);
 
