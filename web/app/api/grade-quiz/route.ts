@@ -6,18 +6,19 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
+const MAX_GRADE_QUIZ_ATTEMPTS = 5;
+
 export async function POST(request: NextRequest) {
-  try {
-    const { lectureAndQuiz, userAnswers } = await request.json();
+  const { lectureAndQuiz, userAnswers } = await request.json();
 
-    if (!lectureAndQuiz || !userAnswers) {
-      return NextResponse.json(
-        { error: 'Lecture/quiz data and user answers are required' },
-        { status: 400 }
-      );
-    }
+  if (!lectureAndQuiz || !userAnswers) {
+    return NextResponse.json(
+      { error: 'Lecture/quiz data and user answers are required' },
+      { status: 400 }
+    );
+  }
 
-    const prompt = `You are a precise and encouraging quiz grader.
+  const prompt = `You are a precise and encouraging quiz grader.
 
 Below is quiz data and the user's answers in JSON format.
 
@@ -48,28 +49,33 @@ The output must follow the following JSON format. The output MUST be valid JSON 
 \t"feedback_summary": "You did well overall! Review Newton's Second Law for more clarity."
 }`;
 
-    const completion = await groq.chat.completions.create({
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-      model: 'llama-3.3-70b-versatile',
-      temperature: 0.5,
-      max_tokens: 2000,
-    });
+  for (let i: number = 0; i < MAX_GRADE_QUIZ_ATTEMPTS; i++) {
+    try {
+      const completion = await groq.chat.completions.create({
+        messages: [
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        model: 'llama-3.3-70b-versatile',
+        temperature: 0.5,
+        max_tokens: 2000,
+      });
 
-    const responseText = completion.choices[0]?.message?.content || '';
+      const responseText = completion.choices[0]?.message?.content || '';
     
-    const gradingResults = JSON.parse(responseText);
+      const gradingResults = JSON.parse(responseText);
 
-    return NextResponse.json(gradingResults);
-  } catch (error) {
-    console.error('Error grading quiz:', error);
-    return NextResponse.json(
-      { error: 'Failed to grade quiz', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+      return NextResponse.json(gradingResults);
+    } catch (error) {
+      console.error('Error grading quiz:', error);
+      continue;
+    }
   }
+
+  return NextResponse.json(
+    { error: 'Failed to grade quiz', details: 'Timed out while grading quiz.' },
+    { status: 500 }
+  );
 }

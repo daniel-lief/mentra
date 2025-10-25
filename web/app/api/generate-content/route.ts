@@ -6,18 +6,19 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
+const MAX_GENERATE_CONTENT_ATTEMPTS = 5;
+
 export async function POST(request: NextRequest) {
-  try {
-    const { moduleTitle, courseTopic } = await request.json();
+  const { moduleTitle, courseTopic } = await request.json();
 
-    if (!moduleTitle || !courseTopic) {
-      return NextResponse.json(
-        { error: 'Module title and course topic are required' },
-        { status: 400 }
-      );
-    }
+  if (!moduleTitle || !courseTopic) {
+    return NextResponse.json(
+      { error: 'Module title and course topic are required' },
+      { status: 400 }
+    );
+  }
 
-    const prompt = `You are an expert teacher creating educational content for an online learning platform like Khan Academy.
+  const prompt = `You are an expert teacher creating educational content for an online learning platform like Khan Academy.
 
 Module Topic: "${moduleTitle}"
 Main Course Topic: "${courseTopic}"
@@ -44,28 +45,33 @@ The output must follow the following JSON format. The output MUST be valid JSON 
 \t]
 }`;
 
-    const completion = await groq.chat.completions.create({
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-      model: 'llama-3.3-70b-versatile',
-      temperature: 0.7,
-      max_tokens: 4000,
-    });
+  for (let i: number = 0; i < MAX_GENERATE_CONTENT_ATTEMPTS; i++) {
+    try {
+      const completion = await groq.chat.completions.create({
+        messages: [
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        model: 'llama-3.3-70b-versatile',
+        temperature: 0.7,
+        max_tokens: 4000,
+      });
 
-    const responseText = completion.choices[0]?.message?.content || '';
-    
-    const content = JSON.parse(responseText);
+      const responseText = completion.choices[0]?.message?.content || '';
+      
+      const content = JSON.parse(responseText);
 
-    return NextResponse.json(content);
-  } catch (error) {
-    console.error('Error generating content:', error);
-    return NextResponse.json(
-      { error: 'Failed to generate content', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+      return NextResponse.json(content);
+    } catch (error) {
+      console.error('Error generating content:', error);
+      continue;
+    }
   }
+
+  return NextResponse.json(
+    { error: 'Failed to generate content', details: 'Timed out while generating lecture content.' },
+    { status: 500 }
+  );
 }

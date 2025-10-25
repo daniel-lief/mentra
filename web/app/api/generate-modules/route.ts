@@ -6,18 +6,19 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
+const MAX_GENERATE_MODULES_ATTEMPTS = 5;
+
 export async function POST(request: NextRequest) {
-  try {
-    const { topic } = await request.json();
+  const { topic } = await request.json();
 
-    if (!topic || typeof topic !== 'string') {
-      return NextResponse.json(
-        { error: 'Topic is required and must be a string' },
-        { status: 400 }
-      );
-    }
+  if (!topic || typeof topic !== 'string') {
+    return NextResponse.json(
+      { error: 'Topic is required and must be a string' },
+      { status: 400 }
+    );
+  }
 
-    const prompt = `You are an expert curriculum designer and educator. Your task is to break down a broad topic into an organized list of study modules that progressively build understanding.
+  const prompt = `You are an expert curriculum designer and educator. Your task is to break down a broad topic into an organized list of study modules that progressively build understanding.
 Topic: "${topic}"
 
 Requirements:
@@ -37,28 +38,33 @@ The output must follow the following JSON format. The output MUST be valid JSON 
 \t...
 ]`;
 
-    const completion = await groq.chat.completions.create({
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-      model: 'llama-3.3-70b-versatile',
-      temperature: 0.7,
-      max_tokens: 2000,
-    });
+  for (let i: number = 0; i < MAX_GENERATE_MODULES_ATTEMPTS; i++) {
+    try {
+      const completion = await groq.chat.completions.create({
+        messages: [
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        model: 'llama-3.3-70b-versatile',
+        temperature: 0.7,
+        max_tokens: 2000,
+      });
 
-    const responseText = completion.choices[0]?.message?.content || '';
+      const responseText = completion.choices[0]?.message?.content || '';
     
-    const modules = JSON.parse(responseText);
+      const modules = JSON.parse(responseText);
 
-    return NextResponse.json({ modules, topic });
-  } catch (error) {
-    console.error('Error generating modules:', error);
-    return NextResponse.json(
-      { error: 'Failed to generate modules', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+      return NextResponse.json({ modules, topic });
+    } catch (error) {
+      console.error('Error generating modules:', error);
+      continue;
+    }
   }
+
+  return NextResponse.json(
+    { error: 'Failed to generate modules', details: 'Timed out while generating modules.' },
+    { status: 500 }
+  );
 }
