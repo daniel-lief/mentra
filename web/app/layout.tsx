@@ -1,59 +1,57 @@
 // app/layout.tsx
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
+const inter = Inter({ 
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-inter",
+});
+
 export const metadata: Metadata = {
-  title: "Mentra",
-  description: "Learn any topic with AI generated modules, lectures, and quizzes.",
+  title: "Mentra - Learn Anything",
+  description: "AI-powered learning platform for mastering any topic",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const shell: React.CSSProperties = {
-    minHeight: "100vh",
-    display: "flex",
-    flexDirection: "column",
-    background: "#0b0f19",
-    color: "#e6e9f2",
-    fontFamily:
-      'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"',
-  };
-
-  const nav: React.CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "16px 20px",
-    borderBottom: "1px solid rgba(255,255,255,0.08)",
-  };
-
-  const brand: React.CSSProperties = { fontWeight: 700, letterSpacing: "0.4px" };
-  const links: React.CSSProperties = { display: "flex", gap: 16, fontSize: 14, opacity: 0.9 };
-
-  const main: React.CSSProperties = { flex: 1, width: "100%", maxWidth: 1100, margin: "0 auto", padding: "28px 20px" };
-
-  const footer: React.CSSProperties = {
-    padding: "16px 20px",
-    borderTop: "1px solid rgba(255,255,255,0.08)",
-    fontSize: 13,
-    color: "rgba(230,233,242,0.7)",
-  };
-
   return (
-    <html lang="en">
-      <body style={shell}>
-        <header style={nav}>
-          <div style={brand}>Mentra</div>
-          <nav aria-label="Primary" style={links}>
-            <a href="#" style={{ color: "inherit", textDecoration: "none" }}>Modules</a>
-            <a href="#" style={{ color: "inherit", textDecoration: "none" }}>About</a>
-            <a href="#" style={{ color: "inherit", textDecoration: "none" }}>Docs</a>
-          </nav>
+    <html lang="en" className={inter.variable}>
+      <body className={`${inter.className} min-h-screen bg-white antialiased`}>
+        <header className="border-b border-slate-200 bg-white">
+          <div className="mx-auto max-w-7xl px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="text-xl font-bold tracking-tight text-slate-900">
+                Mentra
+              </div>
+              <nav className="flex items-center gap-6 text-sm font-medium text-slate-600">
+                <a href="/" className="hover:text-slate-900 transition-colors">
+                  Home
+                </a>
+                <a href="#" className="hover:text-slate-900 transition-colors">
+                  About
+                </a>
+                <a href="#" className="hover:text-slate-900 transition-colors">
+                  Docs
+                </a>
+              </nav>
+            </div>
+          </div>
         </header>
 
-        <main style={main}>{children}</main>
+        <main className="min-h-[calc(100vh-8rem)]">
+          {children}
+        </main>
 
-        <footer style={footer}>
-          © {new Date().getFullYear()} Mentra. Prototype for hackathon use.
+        <footer className="border-t border-slate-200 bg-white">
+          <div className="mx-auto max-w-7xl px-6 py-6">
+            <div className="flex items-center justify-between text-sm text-slate-500">
+              <span>© {new Date().getFullYear()} Mentra. Built for learning.</span>
+              <a href="#" className="hover:text-slate-900 transition-colors">
+                Privacy Policy
+              </a>
+            </div>
+          </div>
         </footer>
       </body>
     </html>
