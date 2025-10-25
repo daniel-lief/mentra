@@ -48,7 +48,7 @@ The output must follow the following JSON format. The output MUST be valid JSON 
           },
         ],
         model: 'llama-3.3-70b-versatile',
-        temperature: 0.7,
+        temperature: 0.5,
         max_tokens: 2000,
       });
 
