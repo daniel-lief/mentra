@@ -28,81 +28,73 @@ export default function CoursePage() {
     setModules(data.modules);
 
     // Load completed modules from sessionStorage
-    const completed = sessionStorage.getItem("completedModules");
-    if (completed) {
-      setCompletedModules(new Set(JSON.parse(completed)));
-    }
+    const loadCompletedModules = () => {
+      const completed = sessionStorage.getItem("completedModules");
+      if (completed) {
+        setCompletedModules(new Set(JSON.parse(completed)));
+      }
+    };
+
+    loadCompletedModules();
+
+    // Listen for storage events to refresh when returning from quiz
+    const handleStorageChange = () => {
+      loadCompletedModules();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    // Also listen for focus events to refresh when tab regains focus
+    window.addEventListener('focus', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('focus', handleStorageChange);
+    };
   }, [router]);
 
   const handleStartModule = (moduleNumber: number) => {
-    const module = modules.find((m) => m.module_number === moduleNumber);
-    if (module) {
-      sessionStorage.setItem("currentModule", JSON.stringify(module));
+    // Store the current module data in sessionStorage
+    const currentModule = modules.find(m => m.module_number === moduleNumber);
+    if (currentModule) {
+      sessionStorage.setItem("currentModule", JSON.stringify(currentModule));
     }
-    router.push('/lecture/${moduleNumber}');
+    router.push(`/lecture/${moduleNumber}`);
   };
 
   const progressPercent = modules.length > 0 
-    ? Math.round((completedModules.size / modules.length) * 100) 
+    ? Math.round((completedModules.size / modules.length) * 100)
     : 0;
 
-  if (!courseTopic) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-lg text-slate-600">Loading course...</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="relative min-h-screen bg-white p-8 md:p-12">
-      {/* Background pattern */}
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_1px_1px,rgba(2,6,23,0.05)_1px,transparent_1px)] [background-size:18px_18px]" />
-
-      <div className="mx-auto w-full max-w-5xl">
-        {/* Back button */}
-        <button
-          onClick={() => router.push("/")}
-          className="mb-6 inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
-        >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Back to Home
-        </button>
-
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 px-6 py-12">
+      <div className="mx-auto max-w-5xl">
         {/* Course Header */}
-        <section className="relative mb-10 overflow-hidden rounded-lg border border-slate-200 bg-white">
-          {/* Gradient background */}
-          <div
-            className="pointer-events-none absolute inset-0 rounded-lg"
-            style={{
-              background:
-                'radial-gradient(circle at top left, rgba(99,102,241,0.18), transparent 40%), radial-gradient(circle at bottom right, rgba(59,130,246,0.18), transparent 40%)',
-            }}
-          />
-          <div className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-black/5" />
+        <section className="mb-12">
+          <button
+            onClick={() => router.push("/")}
+            className="mb-6 inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-white hover:text-slate-900"
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            New Course
+          </button>
 
-          {/* Badge */}
-          <div className="absolute right-6 top-6">
-            <span className="inline-flex items-center rounded-md bg-slate-900 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-white">
-              AI-Generated Course
-            </span>
-          </div>
-
-          <div className="relative z-10 p-8 md:p-10">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/60 px-3 py-1 text-xs font-medium text-slate-600 backdrop-blur-sm">
-              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+          <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+            <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700">
+              <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
               </svg>
-              Curated by Mentra
+              Course
             </div>
 
-            <h1 className="text-4xl font-semibold tracking-tight text-slate-900 md:text-5xl">
+            <h1 className="mb-4 text-4xl font-bold tracking-tight text-slate-900">
               {courseTopic}
             </h1>
-            <p className="mt-3 max-w-2xl text-base leading-relaxed text-slate-600">
-              Master {courseTopic.toLowerCase()} through interactive lessons and hands-on quizzes!
+            
+            <p className="mb-2 text-slate-600">
+              Master {courseTopic} through structured modules, detailed lectures, and knowledge-testing quizzes.
             </p>
 
             <div className="mt-6 flex flex-wrap items-center gap-4">
@@ -146,9 +138,9 @@ export default function CoursePage() {
                   <li key={module.module_number} className="relative pl-10">
                     {/* Timeline dot */}
                     <div
-                      className={`absolute left-2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-4 w-4 rounded-full border-2 flex items-center justify-center ${
+                      className={`absolute left-2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-4 w-4 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                         isCompleted
-                          ? 'border-indigo-600 bg-indigo-600'
+                          ? 'border-green-600 bg-green-600'
                           : 'border-slate-300 bg-white'
                       }`}
                     >
@@ -160,8 +152,12 @@ export default function CoursePage() {
                     </div>
 
                     <div className="group relative overflow-hidden rounded-lg border border-slate-200 bg-white transition-all hover:bg-slate-50">
-                      {/* Top accent line */}
-                      <div className="h-[3px] w-full bg-gradient-to-r from-indigo-600 to-cyan-500 opacity-80" />
+                      {/* Top accent line - BLUE for incomplete, GREEN for completed */}
+                      <div className={`h-[3px] w-full transition-all duration-300 ${
+                        isCompleted 
+                          ? 'bg-gradient-to-r from-green-500 to-emerald-500' 
+                          : 'bg-gradient-to-r from-indigo-600 to-cyan-500 opacity-80'
+                      }`} />
 
                       <div className="flex items-start justify-between p-5">
                         <div className="flex-1 pr-4">

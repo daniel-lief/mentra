@@ -31,6 +31,7 @@ export default function QuizPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [gradingResults, setGradingResults] = useState<GradingResults | null>(null);
   const [isGrading, setIsGrading] = useState(false);
+  const [isPassed, setIsPassed] = useState(false);
   const router = useRouter();
   const params = useParams();
   const moduleId = params.id as string;
@@ -87,10 +88,14 @@ export default function QuizPage() {
       const passingScore = Math.ceil(quiz.length * 0.6); // 60% to pass
       
       if (correctCount >= passingScore) {
+        setIsPassed(true);
         const completedModules = JSON.parse(sessionStorage.getItem("completedModules") || "[]");
         if (!completedModules.includes(parseInt(moduleId))) {
           completedModules.push(parseInt(moduleId));
           sessionStorage.setItem("completedModules", JSON.stringify(completedModules));
+          
+          // Trigger storage event for other tabs/windows
+          window.dispatchEvent(new Event('storage'));
         }
       }
     } catch (error) {
@@ -102,6 +107,8 @@ export default function QuizPage() {
   };
 
   const handleReturnToCourse = () => {
+    // Ensure the course page reloads completed state
+    window.dispatchEvent(new Event('storage'));
     router.push("/course");
   };
 
@@ -164,21 +171,30 @@ export default function QuizPage() {
         >
           <div className="mb-3 flex items-start gap-3">
             {scorePercentage >= 60 ? (
-              <svg className="h-6 w-6 flex-shrink-0 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <div className="rounded-full bg-green-100 p-2">
+                <svg className="h-6 w-6 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
             ) : (
-              <svg className="h-6 w-6 flex-shrink-0 text-orange-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
+              <div className="rounded-full bg-orange-100 p-2">
+                <svg className="h-6 w-6 text-orange-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
             )}
-            <div>
-              <h2 className={`mb-1 font-semibold ${scorePercentage >= 60 ? "text-green-900" : "text-orange-900"}`}>
-                {scorePercentage >= 60 ? "Great job!" : "Keep practicing!"}
-              </h2>
+            <div className="flex-1">
+              <h3 className={`text-lg font-semibold ${scorePercentage >= 60 ? "text-green-900" : "text-orange-900"}`}>
+                {scorePercentage >= 60 ? "Congratulations! 🎉" : "Keep Learning!"}
+              </h3>
               <p className={`text-sm ${scorePercentage >= 60 ? "text-green-800" : "text-orange-800"}`}>
                 {gradingResults.feedback_summary}
               </p>
+              {scorePercentage >= 60 && (
+                <p className="mt-2 text-sm font-medium text-green-900">
+                  ✓ Module completed! Your progress has been saved.
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -186,54 +202,39 @@ export default function QuizPage() {
 
       {/* Quiz Questions */}
       <div className="space-y-6">
-        {quiz.map((question, index) => {
+        {quiz.map((question) => {
           const userAnswer = userAnswers[question.question_number];
           const gradedResult = gradingResults?.graded_results.find(
             (r) => r.question_number === question.question_number
           );
 
           return (
-            <div
-              key={question.question_number}
-              className="rounded-xl border border-slate-200 bg-white p-6"
-            >
-              {/* Question Header */}
-              <div className="mb-4 flex items-start gap-3">
-                <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold text-slate-700">
-                  {index + 1}
-                </span>
-                <h3 className="flex-1 text-lg font-medium text-slate-900">
-                  {question.question_text}
-                </h3>
-              </div>
+            <div key={question.question_number} className="rounded-xl border border-slate-200 bg-white p-6">
+              <p className="mb-4 text-lg font-medium text-slate-900">
+                {question.question_number}. {question.question_text}
+              </p>
 
-              {/* Answer Options */}
-              <div className="ml-10 space-y-2">
-                {question.options.map((option) => {
+              <div className="space-y-2">
+                {question.options.map((option, index) => {
                   const optionLetter = option.charAt(0);
                   const isSelected = userAnswer === optionLetter;
                   const isCorrect = gradedResult?.correct_answer === optionLetter;
                   const isUserWrong = isSubmitted && isSelected && !gradedResult?.is_correct;
 
-                  let optionStyles = "border-slate-200 bg-white hover:bg-slate-50";
-                  if (isSubmitted) {
-                    if (isCorrect) {
-                      optionStyles = "border-green-300 bg-green-50";
-                    } else if (isUserWrong) {
-                      optionStyles = "border-red-300 bg-red-50";
-                    } else if (isSelected) {
-                      optionStyles = "border-slate-300 bg-slate-50";
-                    }
-                  } else if (isSelected) {
-                    optionStyles = "border-indigo-300 bg-indigo-50";
-                  }
-
                   return (
                     <button
-                      key={optionLetter}
+                      key={index}
                       onClick={() => handleSelectAnswer(question.question_number, optionLetter)}
                       disabled={isSubmitted}
-                      className={`w-full rounded-lg border p-4 text-left transition-all ${optionStyles} ${
+                      className={`w-full rounded-lg border-2 p-4 text-left transition-all ${
+                        isSubmitted && isCorrect
+                          ? "border-green-500 bg-green-50"
+                          : isSubmitted && isUserWrong
+                          ? "border-red-500 bg-red-50"
+                          : isSelected
+                          ? "border-indigo-500 bg-indigo-50"
+                          : "border-slate-200 bg-white hover:border-slate-300"
+                      } ${
                         isSubmitted ? "cursor-default" : "cursor-pointer"
                       }`}
                     >

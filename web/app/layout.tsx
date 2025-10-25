@@ -19,12 +19,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={inter.variable}>
       <body className={`${inter.className} min-h-screen bg-white antialiased`}>
         <header className="border-b border-slate-200 bg-white">
-          <div className="mx-auto max-w-7xl px-6 py-4">
+          <div className="mx-auto max-w-7xl px-20 py-4">
             <div className="flex items-center justify-between">
               <div className="text-xl font-bold tracking-tight text-slate-900">
                 Mentra
               </div>
-              <nav className="flex items-center gap-6 text-sm font-medium text-slate-600">
+              <nav className="flex items-center gap-9 text-sm font-normal text-slate-600">
                 <a href="/" className="hover:text-slate-900 transition-colors">
                   Home
                 </a>
