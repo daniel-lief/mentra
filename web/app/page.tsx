@@ -77,7 +77,7 @@ export default function HomePage() {
 
           {/* Input Form */}
           <form onSubmit={handleGenerateCourse} className="mx-auto mb-8 max-w-2xl">
-            <div className="relative flex items-center rounded-full border-2 border-blue-200 bg-white px-6 py-3 transition-all">
+            <div className="relative flex items-center rounded-full bg-[rgba(255,255,255,1)] shadow-sm px-6 py-3 transition-all">
               <input
                 type="text"
                 value={topic}
@@ -88,8 +88,8 @@ export default function HomePage() {
               />
               <button
                 type="submit"
-                disabled={isGenerating || !topic.trim()}
-                className="ml-4 inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-700"
+                disabled={isGenerating}
+                className="ml-4 inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-2 text-sm font-medium text-white transition-all hover:scale-105 disabled:cursor-not-allowed disabled:bg-blue-700"
               >
                 {isGenerating ? (
                   <>
