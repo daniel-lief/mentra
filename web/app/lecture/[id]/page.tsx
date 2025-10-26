@@ -48,6 +48,10 @@ export default function LecturePage() {
   const [courseTopic, setCourseTopic] = useState("");
   const [viewMode, setViewMode] = useState<ViewMode>('lecture');
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const audioRef = useState<HTMLAudioElement | null>(null)[0];
   const router = useRouter();
   const params = useParams();
   const moduleId = params.id as string;
@@ -147,6 +151,69 @@ export default function LecturePage() {
     setCurrentSlideIndex((prev) => Math.max(prev - 1, 0));
   };
 
+  const handlePlayAudio = async () => {
+    if (isPlayingAudio && audioRef) {
+      // Pause if currently playing
+      audioRef.pause();
+      setIsPlayingAudio(false);
+      return;
+    }
+
+    // Get text to read based on current view
+    let textToRead = '';
+    if (viewMode === 'lecture' && content) {
+      textToRead = `${content.lecture_title}. ${content.lecture_text}`;
+    } else if (viewMode === 'slides' && currentSlide) {
+      textToRead = `${currentSlide.title}. ${currentSlide.bullets.join('. ')}`;
+    }
+
+    if (!textToRead) return;
+
+    setIsLoadingAudio(true);
+
+    try {
+      const response = await fetch('/api/text-to-speech', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: textToRead }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate audio');
+      }
+
+      const audioBlob = await response.blob();
+      const url = URL.createObjectURL(audioBlob);
+      setAudioUrl(url);
+
+      // Create and play audio
+      const audio = new Audio(url);
+      audio.onended = () => setIsPlayingAudio(false);
+      audio.play();
+      setIsPlayingAudio(true);
+      
+      // Store reference for pause functionality
+      (audioRef as any) = audio;
+    } catch (error) {
+      console.error('Error playing audio:', error);
+      alert('Failed to play audio. Please try again.');
+    } finally {
+      setIsLoadingAudio(false);
+    }
+  };
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef) {
+        audioRef.pause();
+      }
+      if (audioUrl) {
+        URL.revokeObjectURL(audioUrl);
+      }
+    };
+  }, [audioUrl]);
+
   if (isLoading || !module || !content) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -195,7 +262,34 @@ export default function LecturePage() {
           </div>
 
           {/* Toggle Buttons */}
-          <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-1">
+          <div className="flex items-center gap-3">
+            {/* Audio Play Button */}
+            <button
+              onClick={handlePlayAudio}
+              disabled={isLoadingAudio}
+              className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50"
+              title={isPlayingAudio ? 'Pause audio' : 'Play audio'}
+            >
+              {isLoadingAudio ? (
+                <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+              ) : isPlayingAudio ? (
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+                </svg>
+              ) : (
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              )}
+              <span className="hidden sm:inline">
+                {isLoadingAudio ? 'Loading...' : isPlayingAudio ? 'Pause' : 'Listen'}
+              </span>
+            </button>
+
+            <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-1">
             <button
               onClick={() => handleViewModeChange('lecture')}
               className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
@@ -217,6 +311,7 @@ export default function LecturePage() {
             >
               {isLoadingSlides ? 'Loading...' : 'Slides'}
             </button>
+          </div>
           </div>
         </div>
 
@@ -256,7 +351,14 @@ export default function LecturePage() {
                       alt={currentSlide.title}
                       className="h-full w-full object-cover"
                     />
-                    
+                    <a
+                      href={image.photographer_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute bottom-2 right-2 rounded bg-black/50 px-2 py-1 text-xs text-white backdrop-blur-sm hover:bg-black/70"
+                    >
+                      Photo by {image.photographer}
+                    </a>
                   </div>
                 ))}
               </div>
