@@ -77,7 +77,7 @@ export default function HomePage() {
 
           {/* Input Form */}
           <form onSubmit={handleGenerateCourse} className="mx-auto mb-8 max-w-2xl">
-            <div className="relative flex items-center rounded-full border-2 border-blue-200 bg-white px-6 py-3 transition-all">
+            <div className="relative flex items-center rounded-full shadow-md bg-white px-6 py-3 transition-all">
               <input
                 type="text"
                 value={topic}
