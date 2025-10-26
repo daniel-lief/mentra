@@ -1,4 +1,4 @@
-# ⭐ Mentra
+# ⭐ Mentra (<a href="https://mentra1.vercel.app/">Deployed Link</a>)
 <img width="2088" height="952" alt="Frame 8 (1)" src="https://github.com/user-attachments/assets/359993c2-f2ae-430b-b80f-d8ad6a82b4bb" />
 <img width="2088" height="952" alt="Frame 9 (1)" src="https://github.com/user-attachments/assets/01f920b1-8bc6-40af-ab7c-13188dd1d91d" />
 <img width="2088" height="952" alt="Frame 10 (1)" src="https://github.com/user-attachments/assets/ad7d7a5d-2055-45ed-9dde-0780744a98ea" />
