@@ -230,6 +230,7 @@ export default function LecturePage() {
   const currentSlide = slides[currentSlideIndex];
 
   return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 px-6 py-12">
     <div className="mx-auto max-w-4xl">
       {/* Navigation */}
       <div className="mb-6 flex items-center justify-between">
@@ -247,7 +248,7 @@ export default function LecturePage() {
           <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          15-20 min read
+          5-10 min read
         </div>
       </div>
 
@@ -351,14 +352,7 @@ export default function LecturePage() {
                       alt={currentSlide.title}
                       className="h-full w-full object-cover"
                     />
-                    <a
-                      href={image.photographer_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="absolute bottom-2 right-2 rounded bg-black/50 px-2 py-1 text-xs text-white backdrop-blur-sm hover:bg-black/70"
-                    >
-                      Photo by {image.photographer}
-                    </a>
+                    
                   </div>
                 ))}
               </div>
@@ -446,6 +440,7 @@ export default function LecturePage() {
           Return to Course
         </button>
       </div>
+    </div>
     </div>
   );
 }

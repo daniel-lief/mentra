@@ -48,10 +48,6 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error generating speech:', error);
-    return NextResponse.json(
-      { error: 'Failed to generate speech', details: String(error) },
-      { status: 500 }
-    );
+    return null;
   }
 }
