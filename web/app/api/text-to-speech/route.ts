@@ -48,6 +48,9 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    return null;
+    return NextResponse.json(
+      { error: 'Fish API error' },
+      { status: 500 }
+    );
   }
 }

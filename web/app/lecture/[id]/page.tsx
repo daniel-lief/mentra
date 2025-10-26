@@ -195,8 +195,7 @@ export default function LecturePage() {
       // Store reference for pause functionality
       (audioRef as any) = audio;
     } catch (error) {
-      console.error('Error playing audio:', error);
-      alert('Failed to play audio. Please try again.');
+      // much empty
     } finally {
       setIsLoadingAudio(false);
     }
