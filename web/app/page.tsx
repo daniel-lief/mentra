@@ -56,7 +56,16 @@ export default function HomePage() {
     <div className="relative min-h-screen w-full bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-sky-200 via-blue-50 to-white">
       {/* Header Navigation */}
       <header className="flex items-center justify-between px-6 py-4 md:px-12">
-        <div className="text-xl font-semibold text-slate-900">Mentra</div>
+        <div className="flex items-center gap-2">
+          <img 
+            src="/mentra-icon.png" 
+            alt="Mentra logo" 
+            width={32} 
+            height={32}
+            className="h-8 w-8"
+          />
+          <div className="text-xl font-semibold text-slate-900">Mentra</div>
+        </div>
         <div className="flex items-center gap-3">
           <button className="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100">
             Sign Up
