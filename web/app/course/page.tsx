@@ -156,7 +156,7 @@ export default function CoursePage() {
                       <div className={`h-[3px] w-full transition-all duration-300 ${
                         isCompleted 
                           ? 'bg-gradient-to-r from-green-500 to-emerald-500' 
-                          : 'bg-gradient-to-r from-indigo-600 to-cyan-500 opacity-80'
+                          : 'bg-gradient-to-r from-indigo-400 to-cyan-500 opacity-80'
                       }`} />
 
                       <div className="flex items-start justify-between p-5">
