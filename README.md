@@ -32,6 +32,7 @@ Back end, module generation
 Back end, slide generation
 
 - Fish Audio API
+- Groq API
 - Pexels API
 
 Back end, deployment
